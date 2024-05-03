@@ -9,7 +9,7 @@ function initservice() {
     // Create a service object
     svc = LocalServiceRegistry.createService('whatsappAPI', {
         createRequest: function (service, args) {
-            service.addHeader('Authorization', 'Bearer EAARaRBMdLV4BO253LoW1UZAaAhBIsIjuZA6NeyJaVm8aUO98MgpqxbNcl27aT4j0nik1u9VgFzJWxDZBYBV0cZAo6KeLmdUTaFlbYRYVf9wMVnVCXoUjph213ISkvwLBaHRYK6IJPbS6vS6k30FHM7ad219CuZAbWj1uHZCht1SPfFcn6Boc4oAVsHGj7XZA2iqfMISZBqi3sxVI3LWFSeHBN9gLH2YZD');
+            service.addHeader('Authorization', 'Bearer EAARaRBMdLV4BOZCbmUqtxZASJaYsho9aaycMytyRKcRdkSr9eKu6CViQwx6bZBMpUxsxsyYAAYimNZAHgZAgdAjkoIhOuqYdv2tfwopiWQZAHoZBtPcKpKgWD9mcjfZCH6jPe5VmU8FRiBQ8OWMEhhQzC3XcWV1ly1eINKoKNwFqZC90KT5KizfW6m64ycAM2ep6CXQxOewIEieSZBy318AZBRtPb6ywhvz');
             service.addHeader('Content-Type', 'application/json');
             return (args) ? JSON.stringify(args.data) : null;
         },
