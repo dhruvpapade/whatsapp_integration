@@ -1,6 +1,7 @@
 'use strict';
 
 var whatsAppService = require('~/cartridge/scripts/services/whatsAppService');
+var whatsAppOcapiService = require('~/cartridge/scripts/services/whatsAppOcapi');
 var Resource = require('dw/web/Resource');
 var Logger = require('dw/system/Logger');
 var whatsAppConstants = require('~/cartridge/scripts/util/whatsAppConstants');
@@ -18,21 +19,27 @@ function notifyMsgRead(message_id) {
     return serviceCall(data);
 }
 
+function customerAuth(whatsApp) {
+    var CustomerMgr = require('dw/customer/CustomerMgr');
+    var profile = CustomerMgr.searchProfile('phoneHome = {0}', '919987204154', null);
+    return profile;
+}
+
 /**
  * function name : getcategories
  * purpose : fetch all the available categories of the current site
  */
 function getcategories(whatsApp) {
-    var CatalogMgr = require('dw/catalog/CatalogMgr'),
-        category = [],
-        categories = CatalogMgr.getSiteCatalog().getRoot().getOnlineSubCategories().toArray(); //.filter((item, i, ar) => ar.indexOf(item) === i);
+    var category = [];
+    var data = whatsAppOcapiService.serviceEndpoints.getCategories;
+    var result = whatsAppOcapiService.whatsAppOCAPICall(data);
 
-    categories.forEach(function (element, index) {
-        if (index < 10 && element.custom.showInMenu && (element.hasOnlineProducts() || element.hasOnlineSubCategories())) {
+    result.categories.forEach(function (element, index) {
+        if (index < 10 && element.c_showInMenu) {
             var cat = {
-                "id": 'cgid=' + element.ID,
-                "title": element.displayName.substring(0, 24),
-                "description": '' // element.description ? element.description : '',
+                "id": 'cgid=' + element.id,
+                "title": element.name.substring(0, 24),
+                "description": element.page_title ? element.page_title.substring(0, 72) : '',
             }
             category.push(cat);
         }
@@ -356,7 +363,7 @@ function getMoreImages(whatsApp, pid) {
 function serviceCall(data) {
     var serviceStatus = true;
     try {
-        var serviceResp = whatsAppService.whatsappcall(data);
+        var serviceResp = whatsAppService.whatsAppCall(data);
         //Logger.error('serviceResp: {0} ', JSON.stringify(serviceResp));
         serviceResp.statusCode == 'ERROR' ? serviceStatus = false : serviceStatus = true;
     } catch (e) {
@@ -453,5 +460,6 @@ function processWhatsAppCall(payload) {
 }
 
 module.exports = {
-    processWhatsAppCall: processWhatsAppCall
+    processWhatsAppCall: processWhatsAppCall,
+    customerAuth:customerAuth
 };

@@ -5,12 +5,24 @@ var LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
 var Logger = require('dw/system/Logger');
 var svc;
 
+var serviceEndpoints = {
+    customerAuth:{
+        url: '{0}/customers/auth',
+        method: 'POST',
+    },
+    getCategories: {
+        url: '{0}/categories/root',
+        method: 'GET',
+    },
+};
+
 function initservice() {
     // Create a service object
-    svc = LocalServiceRegistry.createService('whatsapp.api', {
+    svc = LocalServiceRegistry.createService('whatsapp.ocapi', {
         createRequest: function (service, args) {
-            service.addHeader('Authorization', 'Bearer EAARaRBMdLV4BO8PL8g9XhVCf8V4e4Do3rBVX08le04NgkcXTU50XHYRnaZApZBmY7mGtiLHgZCnowQ6erwFjnT7u6h8VJtoJvjwFMhxjpgePHVGLFkXIkc3iR6wG6WbQ0pT6ZCmTGtdQTPeRPUVGJPCEkmJHhqR9W59cIOGfqPZCqnFhkdcbmlTqjWwQHEIfQl47cw6TtnYcXeRc1IHff0qX0CB0c47H1lb0WLZBhXeajBgwZDZD');
+            //service.addHeader('Authorization', 'Bearer EAARaRBMdLV4BOZCbmUqtxZASJaYsho9aaycMytyRKcRdkSr9eKu6CViQwx6bZBMpUxsxsyYAAYimNZAHgZAgdAjkoIhOuqYdv2tfwopiWQZAHoZBtPcKpKgWD9mcjfZCH6jPe5VmU8FRiBQ8OWMEhhQzC3XcWV1ly1eINKoKNwFqZC90KT5KizfW6m64ycAM2ep6CXQxOewIEieSZBy318AZBRtPb6ywhvz');
             service.addHeader('Content-Type', 'application/json');
+            service.addHeader('x-dw-client-id', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
             return (args) ? JSON.stringify(args.data) : null;
         },
         parseResponse: function (service, client) {
@@ -42,13 +54,15 @@ function responseFilter(httpResponse) {
     return JSON.parse(httpResponse.object);
 }
 
-function whatsAppCall(data) {
+function whatsAppOCAPICall (data) {
     initservice();
-    svc.setRequestMethod('POST');
-    var httpResponse = svc.call({ data: data });
+    svc.setURL(require('dw/util/StringUtils').format(data.url, svc.getURL()));
+    svc.setRequestMethod(data.method);
+    var httpResponse = data.method === 'GET' ? svc.call() : svc.call(data.param);
     return responseFilter(httpResponse);
 }
 
 module.exports = {
-    whatsAppCall: whatsAppCall
+    serviceEndpoints: serviceEndpoints,
+    whatsAppOCAPICall: whatsAppOCAPICall
 };
