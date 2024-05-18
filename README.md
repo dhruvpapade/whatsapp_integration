@@ -13,16 +13,18 @@ https://developers.facebook.com/docs/whatsapp/flows/reference/flowsapi
 •	Home:
 ![image](https://github.com/dhruvpapade/whatsapp_integration/assets/96809527/7e71bd78-dc6f-4904-ab82-17156135f6d6)
 
-•	View Sub-Categories:
+•	View Categories:
 ![image](https://github.com/dhruvpapade/whatsapp_integration/assets/96809527/420941e1-aa2a-45d3-bb6f-d7c2ceb43d93)
 ![image](https://github.com/dhruvpapade/whatsapp_integration/assets/96809527/b3a4b359-c817-48a8-9961-56a7a4a64fcc)
 
-•	Products:
+•	View Sub-Categories:
 ![image](https://github.com/dhruvpapade/whatsapp_integration/assets/96809527/5cbb0633-afa7-4f66-9aba-2fab1e76a6b3)
 ![image](https://github.com/dhruvpapade/whatsapp_integration/assets/96809527/a4eefa06-25c1-46f4-a6fd-bdfa95eea799)
 
-•	Load More Images:
+•	Products:
 ![image](https://github.com/dhruvpapade/whatsapp_integration/assets/96809527/a13afb83-5f9d-4a5c-a8bf-aef7c16ed728)
+
+•	Load More Images:
 ![image](https://github.com/dhruvpapade/whatsapp_integration/assets/96809527/8c301091-bbee-494e-8ccb-141b888c0f5f)
 
 •	My Orders:
