@@ -1,13 +1,14 @@
 'use strict';
 
 var Logger = require('dw/system/Logger');
+var whatsAppConstants = require('~/cartridge/scripts/util/whatsAppConstants');
 
-function getProductsList(cgid, start) {
+function getProductsList(cgid, start, pageSize) {
 
     var CatalogMgr = require('dw/catalog/CatalogMgr');
     var PagingModel = require('dw/web/PagingModel');
     var startIndex = start || 0;
-    var pageSize = 9;
+    pageSize = pageSize || whatsAppConstants.LIST_SIZE;
     var categories = CatalogMgr.getCategory(cgid).getOnlineProducts();
 
     var pagingModel = new PagingModel(categories);
@@ -22,7 +23,7 @@ function getProductsList(cgid, start) {
         var product = {
             "id": 'pid=' + element.ID,
             "title": element.name.substring(0, 24),
-            "description": 'ID: ' + element.ID //+' Price: ' + element.priceModel.price.currencyCode + ' ' + element.priceModel.price.value
+            "description": 'ID: ' + element.ID
         }
 
         productList.push(product);

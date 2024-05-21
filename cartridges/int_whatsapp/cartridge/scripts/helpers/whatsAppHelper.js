@@ -47,11 +47,11 @@ function getcategories(whatsApp) {
 
     var data = whatsAppConstants.REPLY_TO_LIST;
     data.to = whatsApp.from;
-    //data.interactive.header.text = ' ';//whatsApp.currentSite.name;//Resource.msg('header', 'whatsapp', null);
     data.interactive.body.text = Resource.msgf('category.bodyText', 'whatsapp', null, whatsApp.user_name);
-    //data.interactive.footer.text = Resource.msgf('footer', 'whatsapp', null, whatsApp.currentSite.name);
-    data.interactive.action.sections[0].rows = category;
-    data.interactive.action.sections[0].title = Resource.msg('category.sections.title', 'whatsapp', null);
+    data.interactive.action.sections.push({
+        "title": Resource.msg('category.sections.title', 'whatsapp', null),
+        "rows": category
+    });
     data.interactive.action.button = Resource.msg('category.btnText', 'whatsapp', null);
     data.context.message_id = whatsApp.ID;
 
@@ -86,9 +86,7 @@ function myOrders(whatsApp) {
 
             var data = whatsAppConstants.REPLY_TO_LIST;
             data.to = whatsApp.from;
-            //data.interactive.header.text = ' ';//whatsApp.currentSite.name;//Resource.msg('header', 'whatsapp', null);
             data.interactive.body.text = Resource.msgf('order.btnText', 'whatsapp', null, whatsApp.user_name);
-            //data.interactive.footer.text = Resource.msgf('footer', 'whatsapp', null, whatsApp.currentSite.name);
             data.interactive.action.sections[0].rows = orderList;
             data.interactive.action.sections[0].title = 'My Orders';
             data.interactive.action.button = 'My Orders';
@@ -152,41 +150,46 @@ function getSubcategoriesOrProducts(whatsApp, cgid, start) {
         data;
 
     if (categories.hasOnlineSubCategories()) {
-        var categoryList = categories.getOnlineSubCategories().toArray(); //.filter((item, i, ar) => ar.indexOf(item) === i);
-        //Logger.error('getSubcategoriesOrProducts {0}', JSON.stringify(categoryList));
+        var categoryList = categories.getOnlineSubCategories().toArray();
         var category = [];
         categoryList.forEach(function (element, index) {
             if (index < 10 && element.custom.showInMenu && (element.hasOnlineProducts() || element.hasOnlineSubCategories())) {
                 var cat = {
                     "id": 'cgid=' + element.ID,
                     "title": element.displayName.substring(0, 24),
-                    "description": '' //element.description ? element.description : ''
+                    "description": element.pageTitle ? element.pageTitle.substring(0, 24) : ''
                 }
                 category.push(cat);
             }
         });
-
+        var pageSize = whatsAppConstants.LIST_SIZE - category.length;
+        var productList = whatsAppProductHelper.getProductsList(cgid, start, pageSize);
         data = whatsAppConstants.REPLY_TO_LIST;
         data.to = whatsApp.from;
-        // data.interactive.header.text = whatsApp.currentSite.name;//Resource.msg('header', 'whatsapp', null);
-        data.interactive.body.text = Resource.msgf('subcategory.bodyText', 'whatsapp', null, whatsApp.user_name);
-        //data.interactive.footer.text = Resource.msg('footer', 'whatsapp', null);
-        data.interactive.action.sections[0].rows = category;
-        data.interactive.action.sections[0].title = whatsApp.msg_body.list_reply.title;
+        data.interactive.body.text = Resource.msgf('subcategory.bodyText', 'whatsapp', null, categories.displayName, categories.pageDescription);
         data.interactive.action.button = Resource.msg('subcategory.btnText', 'whatsapp', null);
         data.context.message_id = whatsApp.ID;
+        data.interactive.action.sections.push({
+            "title": categories.displayName + ' Categories',
+            "rows": category
+        });
+
+        if (productList.length) {
+            data.interactive.action.sections.push({
+                "title": 'Products',
+                "rows": productList
+            });
+        }
 
     } else {
-
-        var productList = whatsAppProductHelper.getProductsList(cgid, start)
-
+        var productList = whatsAppProductHelper.getProductsList(cgid, start, 9)
         data = whatsAppConstants.REPLY_TO_LIST;
         data.to = whatsApp.from;
-        //data.interactive.header.text = whatsApp.currentSite.name;//Resource.msg('header', 'whatsapp', null);
         data.interactive.body.text = Resource.msgf('product.bodyText', 'whatsapp', null, whatsApp.user_name);
-        //data.interactive.footer.text = Resource.msg('footer', 'whatsapp', null);
-        data.interactive.action.sections[0].rows = productList;
-        data.interactive.action.sections[0].title = cgid; //Resource.msg('product.btnText', 'whatsapp', null);
+        data.interactive.action.sections.push({
+            "title": cgid,
+            "rows": productList
+        });
         data.interactive.action.button = Resource.msg('product.btnText', 'whatsapp', null);
         data.context.message_id = whatsApp.ID;
 
@@ -208,7 +211,7 @@ function getProductDetails(whatsApp, pid) {
         productMainBtn = [],
         btnARR = whatsAppConstants.PRODUCT_BUTTON_ARRAY;
 
-    Logger.error('getProductDetails {0}', JSON.stringify(apiProduct));
+    Logger.info('getProductDetails {0}', JSON.stringify(apiProduct));
 
     var category = [];
     for (var btnkey in btnARR) {
@@ -279,15 +282,10 @@ function getmain(whatsApp) {
         };
         mainBtn.push(Btn);
     }
-
     var data = whatsAppConstants.MAIN_MENU;
     data.to = whatsApp.from;
     data.interactive.body.text = Resource.msgf('main.bodyText', 'whatsapp', null, whatsApp.user_name);
-    //data.interactive.footer.text = Resource.msg('main.searchNote', 'whatsapp', null);
-    //data.interactive.header.image.link = apiProduct.images.large[0].absURL;
     data.interactive.action.buttons = mainBtn;
-
-    //Logger.error('getmain1 {0}', JSON.stringify(category));
     return data;
 }
 
@@ -297,28 +295,22 @@ function getmain(whatsApp) {
  */
 function getSuggestions(whatsApp, searchTerms) {
     var suggestionsList = whatsAppProductHelper.getSearchSuggestionsList(searchTerms);
-    //Logger.error('suggestionsList: {0} ', JSON.stringify(suggestionsList));
+    //Logger.info('suggestionsList: {0} ', JSON.stringify(suggestionsList));
 
     if (suggestionsList.length !== 0) {
-
         var data = whatsAppConstants.REPLY_TO_LIST;
         data.to = whatsApp.from;
-        //data.interactive.header.text = whatsApp.currentSite.name;//Resource.msg('header', 'whatsapp', null);
         data.interactive.body.text = Resource.msg('search.bodyText', 'whatsapp', null);
-        //data.interactive.footer.text = Resource.msg('footer', 'whatsapp', null);
         data.interactive.action.sections = suggestionsList;
         data.interactive.action.button = Resource.msg('product.btnText', 'whatsapp', null);
         data.context.message_id = whatsApp.ID;
-
         return data;
 
     } else {
-
         var data = whatsAppConstants.REPLY_TO_TEXT;
         data.to = whatsApp.from;
         data.text.body = Resource.msgf('search.noResult', 'whatsapp', null, searchTerms);
         data.context.message_id = whatsApp.ID;
-
         return data;
     }
 }
@@ -337,9 +329,7 @@ function getMoreImages(whatsApp, pid) {
             var data = whatsAppConstants.IMAGE_BY_URL;
             data.to = whatsApp.from;
             data.image.link = element.absURL;
-
             return serviceCall(data);
-
         });
 
         data = whatsAppConstants.REPLY_TO_TEXT;
@@ -352,7 +342,6 @@ function getMoreImages(whatsApp, pid) {
         data.text.body = Resource.msgf('product.nomoreimages.error', 'whatsapp', null, apiProduct.productName);
         data.context.message_id = whatsApp.ID;
     }
-
     return data;
 }
 
@@ -364,7 +353,7 @@ function serviceCall(data) {
     var serviceStatus = true;
     try {
         var serviceResp = whatsAppService.whatsAppCall(data);
-        //Logger.error('serviceResp: {0} ', JSON.stringify(serviceResp));
+        //Logger.info('serviceResp: {0} ', JSON.stringify(serviceResp));
         serviceResp.statusCode == 'ERROR' ? serviceStatus = false : serviceStatus = true;
     } catch (e) {
         serviceStatus = false;
@@ -380,7 +369,7 @@ function serviceCall(data) {
 function processWhatsAppCall(payload) {
     var data,
         whatsApp = new whatsAppModel(payload);
-    //Logger.error('processWhatsAppCall: {0} ', JSON.stringify(whatsApp));
+
     notifyMsgRead(whatsApp.ID);
 
     switch (whatsApp.msg_type) {
@@ -453,13 +442,10 @@ function processWhatsAppCall(payload) {
             }
             break;
     }
-
-    //Logger.error('data: {0} ', JSON.stringify(data));
-
     return serviceCall(data);
 }
 
 module.exports = {
     processWhatsAppCall: processWhatsAppCall,
-    customerAuth:customerAuth
+    customerAuth: customerAuth
 };

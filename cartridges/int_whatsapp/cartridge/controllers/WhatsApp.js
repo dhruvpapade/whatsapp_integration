@@ -26,15 +26,11 @@ server.use('webhook', function (req, res, next) {
     var whatsappHelper = require('~/cartridge/scripts/helpers/whatsAppHelper'),
       payload = null,
       requestStored = false;
-
     try {
       payload = JSON.parse(req.body);
-      // Logger.error('whatsapp InboundHookRequest to SFCC: {0} ', req.body);
       if (payload.object && payload.entry[0].changes[0].value.messages) {
-
-        Logger.error('whatsapp InboundHookRequest to SFCC: {0} ', req.body);
+        Logger.info('whatsapp InboundHookRequest to SFCC: {0} ', req.body);
         var requestStored = whatsappHelper.processWhatsAppCall(payload);
-
       }
     } catch (e) {
       Logger.error('exception: {0} ', e);
@@ -47,6 +43,7 @@ server.use('webhook', function (req, res, next) {
 
     notOkResponse(res);
   }
+
   next();
 
 });
