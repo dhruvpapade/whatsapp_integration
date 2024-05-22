@@ -20,7 +20,6 @@ function initservice() {
     // Create a service object
     svc = LocalServiceRegistry.createService('whatsapp.ocapi', {
         createRequest: function (service, args) {
-            //service.addHeader('Authorization', 'Bearer EAARaRBMdLV4BOZCbmUqtxZASJaYsho9aaycMytyRKcRdkSr9eKu6CViQwx6bZBMpUxsxsyYAAYimNZAHgZAgdAjkoIhOuqYdv2tfwopiWQZAHoZBtPcKpKgWD9mcjfZCH6jPe5VmU8FRiBQ8OWMEhhQzC3XcWV1ly1eINKoKNwFqZC90KT5KizfW6m64ycAM2ep6CXQxOewIEieSZBy318AZBRtPb6ywhvz');
             service.addHeader('Content-Type', 'application/json');
             service.addHeader('x-dw-client-id', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
             return (args) ? JSON.stringify(args.data) : null;
